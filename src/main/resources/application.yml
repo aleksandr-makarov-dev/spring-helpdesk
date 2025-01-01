@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: helpdesk
+  jpa:
+    show-sql: true
+  datasource:
+    url: jdbc:postgresql://localhost:5432/helpdesk_db
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
