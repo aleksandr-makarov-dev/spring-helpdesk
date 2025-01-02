@@ -30,7 +30,7 @@ public class WebSecurityConfiguration {
                 .authorizeHttpRequests(
                         configurer -> configurer
                                 .requestMatchers("/swagger-ui/**","/v3/api-docs/**").permitAll()
-                                .requestMatchers("/api/users/register").permitAll()
+                                .requestMatchers("/api/users/**").permitAll()
                                 .anyRequest().authenticated())
                 .sessionManagement(
                         configurer -> configurer

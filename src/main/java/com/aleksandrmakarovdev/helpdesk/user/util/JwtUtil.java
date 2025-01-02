@@ -21,11 +21,12 @@ import java.util.function.Function;
 @Service
 public class JwtUtil {
 
-    @Value("{jwt.access-token.secret}")
+    @Value("${jwt.access-token.secret}")
     private String secret;
 
-    @Value("{jwt.access-token.lifetime}")
+    @Value("${jwt.access-token.lifetime}")
     private Duration lifetime;
+
 
     /**
      * Generates the SecretKey used for signing and verifying JWT tokens.
@@ -39,7 +40,7 @@ public class JwtUtil {
 
     /**
      * Extracts the roles from the JWT claims.
-     *
+     * <p>
      * TODO: Make this method typesafe to avoid potential runtime type issues.
      *
      * @param claims JWT claims from which roles are to be extracted.
@@ -124,7 +125,7 @@ public class JwtUtil {
         claims.put("roles", roles);
 
         return Jwts.builder()
-                .subject(userDetails.getUsername())
+                .subject(userDetails.getId().toString())
                 .claims(claims)
                 .issuedAt(Date.from(Instant.now()))
                 .expiration(Date.from(Instant.now().plus(lifetime)))

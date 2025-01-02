@@ -2,13 +2,20 @@ package com.aleksandrmakarovdev.helpdesk.user.service;
 
 import com.aleksandrmakarovdev.helpdesk.exception.RoleNotFoundException;
 import com.aleksandrmakarovdev.helpdesk.exception.UserFoundException;
+import com.aleksandrmakarovdev.helpdesk.security.WebUserDetails;
+import com.aleksandrmakarovdev.helpdesk.user.model.LoginUserRequest;
 import com.aleksandrmakarovdev.helpdesk.user.model.RoleName;
 import com.aleksandrmakarovdev.helpdesk.user.repository.RoleRepository;
 import com.aleksandrmakarovdev.helpdesk.user.repository.UserRepository;
 import com.aleksandrmakarovdev.helpdesk.user.entity.Role;
 import com.aleksandrmakarovdev.helpdesk.user.entity.User;
 import com.aleksandrmakarovdev.helpdesk.user.model.CreateUserRequest;
+import com.aleksandrmakarovdev.helpdesk.user.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,12 +31,10 @@ public class DefaultUserService implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
+    private final AuthenticationManager authenticationManager;
+    private final JwtUtil jwtUtil;
 
-    /**
-     * Creates a new user with given email address and password
-     *
-     * @param createUserRequest The credentials that are used to create new user
-     */
+
     @Override
     @Transactional
     public void createUser(CreateUserRequest createUserRequest) {
@@ -62,5 +67,23 @@ public class DefaultUserService implements UserService {
 
         // Save user to the database
         userRepository.save(userToCreate);
+    }
+
+
+    @Override
+    @Transactional
+    public String loginUser(LoginUserRequest loginUserRequest) {
+
+        // Try to authenticate user with email and password
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginUserRequest.getEmail(), loginUserRequest.getPassword())
+        );
+
+        WebUserDetails userDetails = (WebUserDetails) authentication.getPrincipal();
+        
+        // TODO: create refresh token for user and save it to database
+
+        // Issue access token for the user
+        return jwtUtil.issueToken(userDetails);
     }
 }
