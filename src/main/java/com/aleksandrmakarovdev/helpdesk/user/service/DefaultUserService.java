@@ -13,12 +13,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -33,7 +33,15 @@ public class DefaultUserService implements UserService {
     private final AuthenticationManager authenticationManager;
     private final TokenService tokenService;
 
-
+    /**
+     * Creates a new user in the system with the provided email and password.
+     * Ensures the user does not already exist, assigns the default USER_ROLE,
+     * hashes the password, and saves the user to the database.
+     *
+     * @param createUserRequest The user's registration details (email and password).
+     * @throws UserFoundException    If a user with the same email already exists.
+     * @throws RoleNotFoundException If the default user role cannot be found.
+     */
     @Override
     @Transactional
     public void createUser(CreateUserRequest createUserRequest) {
@@ -68,7 +76,14 @@ public class DefaultUserService implements UserService {
         userRepository.save(userToCreate);
     }
 
-
+    /**
+     * Authenticates a user with the provided email and password.
+     * Issues a pair of tokens (refresh and access) upon successful authentication.
+     *
+     * @param loginUserRequest The user's login credentials (email and password).
+     * @return A {@link TokensResponse} object containing the refresh and access tokens.
+     * @throws AuthenticationException If authentication fails.
+     */
     @Override
     @Transactional
     public TokensResponse loginUser(LoginUserRequest loginUserRequest) {
@@ -78,10 +93,10 @@ public class DefaultUserService implements UserService {
                 new UsernamePasswordAuthenticationToken(loginUserRequest.getEmail(), loginUserRequest.getPassword())
         );
 
+        // Extract authenticated user's details
         WebUserDetails userDetails = (WebUserDetails) authentication.getPrincipal();
 
-        // TODO: create refresh token for user and save it to database
-
+        // Generate tokens for the authenticated user
         Token refreshToken = tokenService.createRefreshToken(userDetails);
         Token accessToken = tokenService.createAccessToken(userDetails);
 

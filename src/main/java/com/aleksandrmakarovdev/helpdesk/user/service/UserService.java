@@ -25,7 +25,7 @@ public interface UserService {
      * If authentication is successful, a JWT token is issued for the user.
      *
      * @param loginUserRequest The login credentials (email and password).
-     * @return A JWT token for the authenticated user.
+     * @return A pair of access and refresh tokens
      * @throws AuthenticationException If authentication fails.
      */
     TokensResponse loginUser(LoginUserRequest loginUserRequest);
