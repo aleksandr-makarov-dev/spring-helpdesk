@@ -29,4 +29,9 @@ public class UsersController {
 
         return ResponseEntity.ok().body(messageResponse);
     }
+
+    @PostMapping("login")
+    public ResponseEntity<?> loginUser() {
+        return ResponseEntity.ok().build();
+    }
 }

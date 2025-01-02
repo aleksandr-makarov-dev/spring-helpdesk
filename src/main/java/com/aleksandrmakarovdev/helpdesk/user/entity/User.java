@@ -16,7 +16,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Email
+@Entity
 @Table(name = "users")
 public class User implements BaseEntity<UUID> {
 

@@ -29,7 +29,8 @@ public class WebSecurityConfiguration {
                 .cors(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
                         configurer -> configurer
-                                .requestMatchers("api/users/register").permitAll()
+                                .requestMatchers("/swagger-ui/**","/v3/api-docs/**").permitAll()
+                                .requestMatchers("/api/users/register").permitAll()
                                 .anyRequest().authenticated())
                 .sessionManagement(
                         configurer -> configurer
