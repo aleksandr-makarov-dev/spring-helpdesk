@@ -4,6 +4,7 @@ import com.aleksandrmakarovdev.helpdesk.exception.RoleNotFoundException;
 import com.aleksandrmakarovdev.helpdesk.exception.UserFoundException;
 import com.aleksandrmakarovdev.helpdesk.user.model.CreateUserRequest;
 import com.aleksandrmakarovdev.helpdesk.user.model.LoginUserRequest;
+import com.aleksandrmakarovdev.helpdesk.user.model.TokensResponse;
 import org.springframework.security.core.AuthenticationException;
 
 public interface UserService {
@@ -27,5 +28,5 @@ public interface UserService {
      * @return A JWT token for the authenticated user.
      * @throws AuthenticationException If authentication fails.
      */
-    String loginUser(LoginUserRequest loginUserRequest);
+    TokensResponse loginUser(LoginUserRequest loginUserRequest);
 }

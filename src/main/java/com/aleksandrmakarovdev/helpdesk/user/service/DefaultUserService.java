@@ -3,24 +3,23 @@ package com.aleksandrmakarovdev.helpdesk.user.service;
 import com.aleksandrmakarovdev.helpdesk.exception.RoleNotFoundException;
 import com.aleksandrmakarovdev.helpdesk.exception.UserFoundException;
 import com.aleksandrmakarovdev.helpdesk.security.WebUserDetails;
-import com.aleksandrmakarovdev.helpdesk.user.model.LoginUserRequest;
-import com.aleksandrmakarovdev.helpdesk.user.model.RoleName;
+import com.aleksandrmakarovdev.helpdesk.user.entity.RefreshToken;
+import com.aleksandrmakarovdev.helpdesk.user.model.*;
 import com.aleksandrmakarovdev.helpdesk.user.repository.RoleRepository;
 import com.aleksandrmakarovdev.helpdesk.user.repository.UserRepository;
 import com.aleksandrmakarovdev.helpdesk.user.entity.Role;
 import com.aleksandrmakarovdev.helpdesk.user.entity.User;
-import com.aleksandrmakarovdev.helpdesk.user.model.CreateUserRequest;
-import com.aleksandrmakarovdev.helpdesk.user.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,7 +31,7 @@ public class DefaultUserService implements UserService {
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
     private final AuthenticationManager authenticationManager;
-    private final JwtUtil jwtUtil;
+    private final TokenService tokenService;
 
 
     @Override
@@ -62,7 +61,7 @@ public class DefaultUserService implements UserService {
                 .username(createUserRequest.getEmail())
                 .passwordHash(passwordHash)
                 .roles(List.of(userRole.get()))
-                .createdAt(LocalDateTime.now())
+                .createdAt(Date.from(Instant.now()))
                 .build();
 
         // Save user to the database
@@ -72,7 +71,7 @@ public class DefaultUserService implements UserService {
 
     @Override
     @Transactional
-    public String loginUser(LoginUserRequest loginUserRequest) {
+    public TokensResponse loginUser(LoginUserRequest loginUserRequest) {
 
         // Try to authenticate user with email and password
         Authentication authentication = authenticationManager.authenticate(
@@ -80,10 +79,12 @@ public class DefaultUserService implements UserService {
         );
 
         WebUserDetails userDetails = (WebUserDetails) authentication.getPrincipal();
-        
+
         // TODO: create refresh token for user and save it to database
 
-        // Issue access token for the user
-        return jwtUtil.issueToken(userDetails);
+        Token refreshToken = tokenService.createRefreshToken(userDetails);
+        Token accessToken = tokenService.createAccessToken(userDetails);
+
+        return new TokensResponse(refreshToken, accessToken);
     }
 }

@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -33,13 +34,13 @@ public class User implements BaseEntity<UUID> {
     private String passwordHash;
 
     @Column(name = "created_at")
-    private LocalDateTime createdAt;
+    private Date createdAt;
 
     @Column(name = "email_confirmed_at")
-    private LocalDateTime emailConfirmedAt;
+    private Date emailConfirmedAt;
 
     @Column(name = "lockout_expires_at")
-    private LocalDateTime lockoutExpiresAt;
+    private Date lockoutExpiresAt;
 
     @Column(name = "access_failed_count")
     private Integer accessFailedCount;
@@ -47,4 +48,5 @@ public class User implements BaseEntity<UUID> {
     @ManyToMany
     @JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private List<Role> roles;
+
 }

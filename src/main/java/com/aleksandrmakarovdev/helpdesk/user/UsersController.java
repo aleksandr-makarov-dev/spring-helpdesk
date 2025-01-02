@@ -3,6 +3,7 @@ package com.aleksandrmakarovdev.helpdesk.user;
 import com.aleksandrmakarovdev.helpdesk.base.MessageResponse;
 import com.aleksandrmakarovdev.helpdesk.user.model.CreateUserRequest;
 import com.aleksandrmakarovdev.helpdesk.user.model.LoginUserRequest;
+import com.aleksandrmakarovdev.helpdesk.user.model.TokensResponse;
 import com.aleksandrmakarovdev.helpdesk.user.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -34,8 +35,8 @@ public class UsersController {
     @PostMapping("login")
     public ResponseEntity<?> loginUser(@Valid @RequestBody LoginUserRequest loginUserRequest) {
 
-        String accessToken = userService.loginUser(loginUserRequest);
+        TokensResponse tokensResponse = userService.loginUser(loginUserRequest);
 
-        return ResponseEntity.ok().body(new MessageResponse(accessToken));
+        return ResponseEntity.ok().body(tokensResponse);
     }
 }

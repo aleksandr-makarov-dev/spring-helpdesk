@@ -1,7 +1,9 @@
 package com.aleksandrmakarovdev.helpdesk.user.util;
 
 import com.aleksandrmakarovdev.helpdesk.security.WebUserDetails;
+import com.aleksandrmakarovdev.helpdesk.user.model.Token;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ClaimsBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,6 +14,7 @@ import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,11 +24,12 @@ import java.util.function.Function;
 @Service
 public class JwtUtil {
 
-    @Value("${jwt.access-token.secret}")
+    @Value("${jwt.secret}")
     private String secret;
 
-    @Value("${jwt.access-token.lifetime}")
-    private Duration lifetime;
+    public static final Duration ACCESS_TOKEN_LIFETIME = Duration.ofMinutes(30);
+    public static final Duration REFRESH_TOKEN_LIFETIME = Duration.ofDays(1);
+    public static final Duration EMAIL_CONFIRMATION_TOKEN_LIFETIME = Duration.ofDays(1);
 
 
     /**
@@ -107,30 +111,20 @@ public class JwtUtil {
         return getClaim(token, this::extractRoles);
     }
 
-    /**
-     * Issues a new JWT token for the given user details.
-     *
-     * @param userDetails The details of the user for whom the token is being issued.
-     * @return A JWT token string containing user information and roles.
-     */
-    public String issueToken(WebUserDetails userDetails) {
-        Map<String, Object> claims = new HashMap<>();
 
-        List<String> roles = userDetails.getAuthorities()
-                .stream()
-                .map(GrantedAuthority::getAuthority)
-                .toList();
+    public Token issue(Map<String, Object> claims, Duration lifetime) {
 
-        claims.put("username", userDetails.getUsername());
-        claims.put("roles", roles);
+        Date issuedAt = Date.from(Instant.now());
+        Date expiresAt = Date.from(Instant.now().plus(lifetime));
 
-        return Jwts.builder()
-                .subject(userDetails.getId().toString())
+        String token = Jwts.builder()
                 .claims(claims)
-                .issuedAt(Date.from(Instant.now()))
-                .expiration(Date.from(Instant.now().plus(lifetime)))
+                .issuedAt(issuedAt)
+                .expiration(expiresAt)
                 .signWith(getKey(), Jwts.SIG.HS256)
                 .compact();
+
+        return new Token(token, issuedAt, expiresAt);
     }
 }
 
