@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,6 +52,7 @@ public class DefaultUserService implements UserService {
                 .username(createUserRequest.getEmail())
                 .passwordHash(passwordHash)
                 .roles(List.of(userRole.get()))
+                .createdAt(LocalDateTime.now())
                 .build();
 
         // Save user to the database

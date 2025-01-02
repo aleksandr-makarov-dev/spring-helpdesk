@@ -1,6 +1,6 @@
 create table if not exists public.users
 (
-    id                  varchar(36) primary key default gen_random_uuid(),
+    id                  uuid primary key default gen_random_uuid(),
     username            varchar(254) not null unique,
     email               varchar(320) not null unique,
     password_hash       varchar(72)  not null,
@@ -12,14 +12,14 @@ create table if not exists public.users
 
 create table if not exists public.roles
 (
-    id   varchar(36) primary key default gen_random_uuid(),
+    id   uuid primary key default gen_random_uuid(),
     name varchar(72) not null unique
 );
 
 create table if not exists public.users_roles
 (
-    id      varchar(36) primary key default gen_random_uuid(),
-    user_id varchar(36) not null references users (id),
-    role_id varchar(36) not null references roles (id),
+    id      uuid primary key default gen_random_uuid(),
+    user_id uuid not null references users (id),
+    role_id uuid not null references roles (id),
     constraint uk_user_id_role_id unique (user_id, role_id)
 )
