@@ -8,3 +8,7 @@ spring:
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
+jwt:
+  access-token:
+    secret: 016cbe70713432028cad3a709b2ba56b
+    lifetime: 30m

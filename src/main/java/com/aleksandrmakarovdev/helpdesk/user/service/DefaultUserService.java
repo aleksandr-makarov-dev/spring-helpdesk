@@ -25,6 +25,11 @@ public class DefaultUserService implements UserService {
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
 
+    /**
+     * Creates a new user with given email address and password
+     *
+     * @param createUserRequest The credentials that are used to create new user
+     */
     @Override
     @Transactional
     public void createUser(CreateUserRequest createUserRequest) {
