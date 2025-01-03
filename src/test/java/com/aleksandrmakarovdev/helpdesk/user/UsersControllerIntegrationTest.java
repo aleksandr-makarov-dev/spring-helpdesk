@@ -26,32 +26,24 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 class UsersControllerIntegrationTest {
 
-    @Container
-    private static final PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>(DockerImageName.parse("postgres:17.2"));
-
-    @DynamicPropertySource
-    static void configureProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgreSQLContainer::getJdbcUrl);
-        registry.add("spring.datasource.username", postgreSQLContainer::getUsername);
-        registry.add("spring.datasource.password", postgreSQLContainer::getPassword);
-    }
-
     @Autowired
     private MockMvc mockMvc;
 
     @Autowired
     private UserRepository userRepository;
 
-    @BeforeEach()
+    @BeforeEach
     void setUp() {
     }
 
+    /**
+     * Test: Register a user with valid credentials.
+     * This test ensures that when valid credentials are provided,
+     * the user is registered successfully, and the response contains a success message.
+     */
     @Test
     @DisplayName("Try to register user with valid credentials should return success message")
     void registerUser_whenValidCredentials_shouldReturnSuccessMessage() throws Exception {
-
-        // Given
-
         var requestBuilder = MockMvcRequestBuilders.post("/api/users/register")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content("""
@@ -61,10 +53,7 @@ class UsersControllerIntegrationTest {
                         }
                         """);
 
-        // When
-
         mockMvc.perform(requestBuilder)
-                // Then
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().json("""
@@ -74,11 +63,13 @@ class UsersControllerIntegrationTest {
                         """));
     }
 
+    /**
+     * Test: Attempt to register a user with an already registered email.
+     * This test ensures that a conflict response is returned when the email already exists.
+     */
     @Test
     @DisplayName("Try to register email that already registered should return conflict")
     void registerUser_whenUserAlreadyExists_shouldReturnConflict() throws Exception {
-
-        // Given
         var requestBuilder = MockMvcRequestBuilders.post("/api/users/register")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content("""
@@ -88,12 +79,9 @@ class UsersControllerIntegrationTest {
                         }
                         """);
 
-        mockMvc.perform(requestBuilder);
-
-        // When
+        mockMvc.perform(requestBuilder); // First registration to set up the scenario
 
         mockMvc.perform(requestBuilder)
-                // Then
                 .andDo(print())
                 .andExpect(status().isConflict())
                 .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
@@ -104,6 +92,10 @@ class UsersControllerIntegrationTest {
                         """));
     }
 
+    /**
+     * Test: Attempt to register a user with invalid credentials.
+     * This test ensures that validation errors are handled correctly and an appropriate response is returned.
+     */
     @Test
     @DisplayName("Try to register user with invalid credentials should return validation error")
     void registerUser_whenInvalidCredentials_shouldReturnValidationError() throws Exception {
@@ -112,7 +104,7 @@ class UsersControllerIntegrationTest {
                 .content("""
                         {
                         "email": "invalidemail",
-                        "password": "123"
+                        "password": "12345678"
                         }
                         """);
 
@@ -125,9 +117,9 @@ class UsersControllerIntegrationTest {
                         """));
     }
 
-
     @AfterEach
     void tearDown() {
+        // Clean up the database after each test to ensure test isolation
         userRepository.deleteAll();
     }
 }
