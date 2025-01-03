@@ -1,4 +1,4 @@
-create table if not exists public.users
+create table if not exists users
 (
     id                  uuid primary key default gen_random_uuid(),
     username            varchar(254) not null unique,
@@ -10,13 +10,13 @@ create table if not exists public.users
     access_failed_count int
 );
 
-create table if not exists public.roles
+create table if not exists roles
 (
     id   uuid primary key default gen_random_uuid(),
     name varchar(72) not null unique
 );
 
-create table if not exists public.users_roles
+create table if not exists users_roles
 (
     id      uuid primary key default gen_random_uuid(),
     user_id uuid not null references users (id),

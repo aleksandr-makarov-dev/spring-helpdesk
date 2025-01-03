@@ -1,4 +1,4 @@
-create table if not exists public.refresh_tokens
+create table if not exists refresh_tokens
 (
     id         uuid primary key      default gen_random_uuid(),
     token      varchar(512) not null unique,
