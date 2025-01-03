@@ -34,6 +34,22 @@ public class GlobalControllerExceptionAdvice {
         return ResponseEntity.status(problemDetail.getStatus()).body(problemDetail);
     }
 
+    @ExceptionHandler({UserNotFoundException.class})
+    public ResponseEntity<ProblemDetail> handleUserNotFoundException(final UserNotFoundException e) {
+        ProblemDetail problemDetail = ProblemDetail
+                .forStatusAndDetail(HttpStatus.NOT_FOUND, e.getMessage());
+
+        return ResponseEntity.status(problemDetail.getStatus()).body(problemDetail);
+    }
+
+    @ExceptionHandler({UserFoundException.class})
+    public ResponseEntity<ProblemDetail> handleUserFoundException(final UserFoundException e) {
+        ProblemDetail problemDetail = ProblemDetail
+                .forStatusAndDetail(HttpStatus.CONFLICT, e.getMessage());
+
+        return ResponseEntity.status(problemDetail.getStatus()).body(problemDetail);
+    }
+
     @ExceptionHandler({Exception.class})
     public ResponseEntity<ProblemDetail> handleException(final Exception e) {
         log.error("Unexpected error occurred", e);

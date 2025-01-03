@@ -2,8 +2,8 @@ package com.aleksandrmakarovdev.helpdesk.user.service;
 
 import com.aleksandrmakarovdev.helpdesk.exception.RoleNotFoundException;
 import com.aleksandrmakarovdev.helpdesk.exception.UserFoundException;
+import com.aleksandrmakarovdev.helpdesk.exception.UserNotFoundException;
 import com.aleksandrmakarovdev.helpdesk.security.WebUserDetails;
-import com.aleksandrmakarovdev.helpdesk.user.entity.RefreshToken;
 import com.aleksandrmakarovdev.helpdesk.user.model.*;
 import com.aleksandrmakarovdev.helpdesk.user.repository.RoleRepository;
 import com.aleksandrmakarovdev.helpdesk.user.repository.UserRepository;
@@ -22,6 +22,7 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -101,5 +102,12 @@ public class DefaultUserService implements UserService {
         Token accessToken = tokenService.createAccessToken(userDetails);
 
         return new TokensResponse(refreshToken, accessToken);
+    }
+
+    @Override
+    public UserProfileResponse getUserProfile(UUID userId) {
+        return userRepository.findById(userId)
+                .map(user -> new UserProfileResponse(user.getId(), user.getEmail(), user.getRoles().stream().map(Role::getName).toList()))
+                .orElseThrow(() -> new UserNotFoundException(String.format("User '%s' not found", userId.toString())));
     }
 }

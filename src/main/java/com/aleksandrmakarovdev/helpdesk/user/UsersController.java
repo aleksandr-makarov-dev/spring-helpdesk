@@ -4,20 +4,21 @@ import com.aleksandrmakarovdev.helpdesk.base.MessageResponse;
 import com.aleksandrmakarovdev.helpdesk.user.model.CreateUserRequest;
 import com.aleksandrmakarovdev.helpdesk.user.model.LoginUserRequest;
 import com.aleksandrmakarovdev.helpdesk.user.model.TokensResponse;
+import com.aleksandrmakarovdev.helpdesk.user.model.UserProfileResponse;
 import com.aleksandrmakarovdev.helpdesk.user.service.UserService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.UUID;
 
+@Tag(name = "Users", description = "Endpoints for user registration and authentication")
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
@@ -78,5 +79,12 @@ public class UsersController {
 
         // Return access token in response body and refresh token in cookie
         return ResponseEntity.ok().body(tokensResponse.accessToken());
+    }
+
+    @GetMapping("profile")
+    public ResponseEntity<?> getUserProfile() {
+        UserProfileResponse userProfileResponse = userService.getUserProfile(UUID.randomUUID());
+
+        return ResponseEntity.ok().body(userProfileResponse);
     }
 }

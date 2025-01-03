@@ -4,9 +4,9 @@ spring:
   jpa:
     show-sql: true
   datasource:
-    url: jdbc:postgresql://localhost:5432/helpdesk_db
-    username: postgres
-    password: postgres
+    url: ${DB_CONNECTION_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
 jwt:
-  secret: 016cbe70713432028cad3a709b2ba56b
+  secret: ${JWT_SECRET}
